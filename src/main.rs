@@ -17,9 +17,19 @@ pub enum GetDogsError {
 // Make the variants of this enum directly available.
 use GetDogsError::*;
 
-// All of the Error trait methods have default implementations,
-// so no body is required here.
-impl Error for GetDogsError {}
+// All of the Error trait methods have default implementations, so
+// no body is required here, but we will implement the source method.
+impl Error for GetDogsError {
+    // Returns the wrapped error, if any.
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match *self {
+            // The wrapped error type is implicitly cast to the trait object
+            // type &Error because it implements the Error trait.
+            BadFile(ref e) => Some(e),
+            BadJson(ref e) => Some(e),
+        }
+    }
+}
 
 impl std::fmt::Display for GetDogsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
