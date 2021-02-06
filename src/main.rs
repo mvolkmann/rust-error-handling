@@ -15,6 +15,7 @@ pub enum GetDogsError {
 // Make the variants of this enum directly available.
 use GetDogsError::*;
 
+//TODO: Why don't I have to implement the cause and description methods?
 impl Error for GetDogsError {} // no body is necessary
 
 impl std::fmt::Display for GetDogsError {
@@ -28,7 +29,7 @@ impl std::fmt::Display for GetDogsError {
 
 // The "From" trait converts values of one type to another.
 // Having the following implementations enables
-// using the ? operator in the get_dogs3 function.
+// using the ? operator in the get_dogs3 function below.
 impl From<std::io::Error> for GetDogsError {
     fn from(other: std::io::Error) -> Self {
         BadFile(other)
@@ -40,6 +41,7 @@ impl From<serde_json::error::Error> for GetDogsError {
     }
 }
 
+// This struct can be deserialized from JSON and serialized to JSON.
 #[derive(Deserialize, Serialize, Debug)]
 struct Dog {
     name: String,
@@ -96,6 +98,7 @@ fn main() {
     let file_path = "./dogs.json";
 
     /*
+    // With the first approach we can easily detect that an error has occurred.
     if let Ok(dogs) = get_dogs1(file_path) {
         dbg!(dogs);
     } else {
@@ -103,6 +106,24 @@ fn main() {
     }
     */
 
+    /*
+    // But handling different kinds of errors differently is messy.
+    match get_dogs1(file_path) {
+        Ok(dogs) => println!("{:?}", dogs),
+        Err(e) => {
+            if let Some(e) = e.downcast_ref::<std::io::Error>() {
+                eprintln!("bad file: {:?}", e);
+            } else if let Some(e) = e.downcast_ref::<serde_json::error::Error>() {
+                eprintln!("bad json {:?}", e);
+            } else {
+                eprintln!("some other kind of error");
+            }
+        }
+    }
+    */
+
+    // With the second and third approaches it is much easier
+    // to handle different kinds of errors differently.
     //match get_dogs2(file_path) {
     match get_dogs3(file_path) {
         Ok(dogs) => println!("{:?}", dogs),
