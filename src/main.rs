@@ -4,6 +4,8 @@ use std::fmt;
 use std::fs::read_to_string;
 
 // This is a custom error type.
+// It enables callers that receive this kind of error
+// to handle different error causes differently.
 // These must implement the Error trait which requires
 // implementing the Debug and Display traits.
 #[derive(Debug)]
@@ -15,8 +17,9 @@ pub enum GetDogsError {
 // Make the variants of this enum directly available.
 use GetDogsError::*;
 
-//TODO: Why don't I have to implement the cause and description methods?
-impl Error for GetDogsError {} // no body is necessary
+// All of the Error trait methods have default implementations,
+// so no body is required here.
+impl Error for GetDogsError {}
 
 impl std::fmt::Display for GetDogsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
